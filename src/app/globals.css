@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8f5;
+  --foreground: #2b2622;
+
+  /* Palette "Famille Maykas" — tons terre, or et bois, chaleureux et élégants */
+  --color-primary: #8b4513;
+  --color-primary-light: #c97b4a;
+  --color-primary-dark: #5e2e0c;
+
+  --color-gold: #d4a857;
+  --color-gold-light: #f0d9a8;
+
+  --color-forest: #2f4f3e;
+  --color-forest-light: #4a7a63;
+
+  --color-cream: #faf8f5;
+  --color-card: #ffffff;
+  --color-border: #e8e1d8;
+
+  --color-text: #2b2622;
+  --color-text-muted: #7a6f63;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-gold: var(--color-gold);
+  --color-gold-light: var(--color-gold-light);
+  --color-forest: var(--color-forest);
+  --color-forest-light: var(--color-forest-light);
+  --color-cream: var(--color-cream);
+  --color-card: var(--color-card);
+  --color-border: var(--color-border);
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(43, 38, 34, 0.04);
+}
+
+.tree-line {
+  stroke: var(--color-gold);
+  stroke-width: 2;
+  fill: none;
+}
+
+.tree-line-spouse {
+  stroke: var(--color-forest-light);
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  fill: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold-light);
+  border-radius: 4px;
+}
