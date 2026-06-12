@@ -4,5 +4,210 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres.vjxswefeaorhnffcohzw:Stone%402004170@db.vjxswefeaorhnffcohzw.supabase.co:5432/postgres?pgbouncer=true"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MEMBRE_VERIFIE
+  MEMBRE_STANDARD
+}
+
+enum Sexe {
+  HOMME
+  FEMME
+}
+
+enum SituationMatrimoniale {
+  CELIBATAIRE
+  MARIE
+  DIVORCE
+  VEUF
+  CONCUBINAGE
+}
+
+enum TypeRelationFamiliale {
+  PARENT_ENFANT
+  CONJOINT
+  FRERE_SOEUR
+}
+
+enum StatutCompte {
+  EN_ATTENTE
+  ACTIF
+  SUSPENDU
+}
+
+enum TypeNotification {
+  NOUVEAU_MEMBRE
+  PROFIL_MIS_A_JOUR
+  NAISSANCE
+  MARIAGE
+  SIGNALEMENT
+}
+
+enum TypeEvenement {
+  NAISSANCE
+  MARIAGE
+  DECES
+  DIPLOME
+  DEMENAGEMENT
+  AUTRE
+}
+
+model Membre {
+  id                String   @id @default(cuid())
+
+  email             String?  @unique
+  motDePasseHash    String?
+  role              Role     @default(MEMBRE_STANDARD)
+  statutCompte      StatutCompte @default(EN_ATTENTE)
+
+  nom               String
+  postNom           String?
+  prenom            String
+  sexe              Sexe
+  dateNaissance     DateTime?
+  lieuNaissance     String?
+  dateDeces         DateTime?
+  estDecede         Boolean  @default(false)
+
+  nationalite       String?
+  pays              String?
+  ville             String?
+  adresse           String?
+  telephonePrincipal String?
+  telephoneSecondaire String?
+
+  profession        String?
+  entreprise        String?
+  etudes            String?
+  situationMatrimoniale SituationMatrimoniale?
+  biographie        String?  @db.Text
+  hobbies           String?
+  siteWeb           String?
+  reseauxSociaux    Json?
+
+  photoProfilUrl    String?
+  banniereUrl       String?
+
+  latitude          Float?
+  longitude         Float?
+
+  generation        Int      @default(0)
+
+  creePar           Membre?  @relation("CreateurProfil", fields: [creeParId], references: [id])
+  creeParId         String?
+  profilsCrees      Membre[] @relation("CreateurProfil")
+
+  relationsA        RelationFamiliale[] @relation("MembreA")
+  relationsB        RelationFamiliale[] @relation("MembreB")
+
+  photos            Photo[]
+  documents         Document[]
+  evenements        Evenement[]
+  notificationsRecues Notification[] @relation("Destinataire")
+  notificationsEmises Notification[] @relation("Emetteur")
+  signalements      Signalement[]    @relation("Auteur")
+  signalementsRecus Signalement[]    @relation("Cible")
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([nom, prenom])
+  @@index([ville])
+  @@index([profession])
+  @@index([generation])
+}
+
+model RelationFamiliale {
+  id          String   @id @default(cuid())
+
+  type        TypeRelationFamiliale
+
+  membreA     Membre   @relation("MembreA", fields: [membreAId], references: [id], onDelete: Cascade)
+  membreAId   String
+  membreB     Membre   @relation("MembreB", fields: [membreBId], references: [id], onDelete: Cascade)
+  membreBId   String
+
+  dateDebut   DateTime?
+  dateFin     DateTime?
+  statutActuel Boolean  @default(true)
+
+  createdAt   DateTime @default(now())
+
+  @@unique([membreAId, membreBId, type])
+  @@index([membreAId])
+  @@index([membreBId])
+}
+
+model Photo {
+  id          String   @id @default(cuid())
+  membre      Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membreId    String
+  url         String
+  legende     String?
+  album       String?
+  createdAt   DateTime @default(now())
+
+  @@index([membreId])
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  membre      Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membreId    String
+  url         String
+  nom         String
+  type        String?
+  createdAt   DateTime @default(now())
+
+  @@index([membreId])
+}
+
+model Evenement {
+  id          String   @id @default(cuid())
+  membre      Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membreId    String
+  type        TypeEvenement
+  titre       String
+  description String?  @db.Text
+  date        DateTime
+  lieu        String?
+  createdAt   DateTime @default(now())
+
+  @@index([membreId])
+  @@index([date])
+}
+
+model Notification {
+  id            String   @id @default(cuid())
+  type          TypeNotification
+  message       String
+
+  destinataire  Membre   @relation("Destinataire", fields: [destinataireId], references: [id], onDelete: Cascade)
+  destinataireId String
+
+  emetteur      Membre?  @relation("Emetteur", fields: [emetteurId], references: [id], onDelete: SetNull)
+  emetteurId    String?
+
+  lu            Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([destinataireId, lu])
+}
+
+model Signalement {
+  id          String   @id @default(cuid())
+  auteur      Membre   @relation("Auteur", fields: [auteurId], references: [id], onDelete: Cascade)
+  auteurId    String
+  cible       Membre   @relation("Cible", fields: [cibleId], references: [id], onDelete: Cascade)
+  cibleId     String
+  motif       String
+  description String?  @db.Text
+  traite      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([traite])
 }
