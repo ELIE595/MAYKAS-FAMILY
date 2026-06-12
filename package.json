@@ -10,18 +10,29 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+<<<<<<< HEAD
+=======
+    "@prisma/client": "^7.8.0",
+>>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.4.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.17.0",
     "next": "16.2.9",
+<<<<<<< HEAD
+=======
+    "prisma": "^7.8.0",
+>>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.78.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@prisma/client": "^5.22.0",
+=======
+>>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
@@ -30,7 +41,10 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+<<<<<<< HEAD
     "prisma": "^5.22.0",
+=======
+>>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
