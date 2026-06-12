@@ -1,55 +1,24 @@
 {
-  "name": "famille-maykas",
-  "version": "0.1.0",
+  "name": "maykas-family",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.4.0",
-<<<<<<< HEAD
-=======
-    "@prisma/client": "^7.8.0",
->>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
-    "bcryptjs": "^3.0.3",
-    "date-fns": "^4.4.0",
-    "jsonwebtoken": "^9.0.3",
-    "lucide-react": "^1.17.0",
-    "next": "16.2.9",
-<<<<<<< HEAD
-=======
-    "prisma": "^7.8.0",
->>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-hook-form": "^7.78.0",
-    "zod": "^4.4.3"
+    "@prisma/client": "^5.22.0",
+    "next": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "@prisma/client": "^5.22.0",
-=======
->>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
-    "@tailwindcss/postcss": "^4",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-<<<<<<< HEAD
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "prisma": "^5.22.0",
-=======
->>>>>>> 6f7989ba742188d90f8d28f40c844533c8e547fb
-    "tailwindcss": "^4",
-    "ts-node": "^10.9.2",
     "typescript": "^5"
-  },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }
