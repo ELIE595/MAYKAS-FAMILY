@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { TreePine, Users, LayoutDashboard, LogIn, Search } from "lucide-react";
+import { TreePine, Users, LayoutDashboard, LogIn, Search, Image } from "lucide-react";
 
 export default function EnTete() {
   return (
@@ -18,6 +18,7 @@ export default function EnTete() {
           <NavLink href="/arbre" icon={<TreePine size={16} />} label="Arbre généalogique" />
           <NavLink href="/membres" icon={<Users size={16} />} label="Membres" />
           <NavLink href="/recherche" icon={<Search size={16} />} label="Recherche" />
+          <NavLink href="/galerie" icon={<Image size={16} />} label="Galerie" />
           <NavLink href="/admin" icon={<LayoutDashboard size={16} />} label="Administration" />
         </nav>
 
