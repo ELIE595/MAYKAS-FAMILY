@@ -1,0 +1,25 @@
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/package.json b/package.json[m
+[1mindex 718a3c9..08b489c 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -1,10 +1,10 @@[m
+[31m-{[m
+[32m+[m[32m﻿{[m
+   "name": "maykas-family",[m
+   "version": "1.0.0",[m
+   "private": true,[m
+   "scripts": {[m
+     "dev": "next dev",[m
+[31m-    "build":"build": "prisma generate && next build",[m
+[32m+[m[32m    "build": "prisma generate && next build",[m
+     "start": "next start",[m
+     "lint": "next lint"[m
+   },[m
+[36m@@ -21,4 +21,4 @@[m
+     "prisma": "^5.22.0",[m
+     "typescript": "^5"[m
+   }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m}[m
