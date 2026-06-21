@@ -78,12 +78,20 @@ export default async function PageProfil({ params }: { params: Promise<{ id: str
             <span className="flex items-center gap-1"><Calendar size={14} /> Né(e) le {formatDate(membre.dateNaissance)}</span>
           </div>
         </div>
-        <Link
-          href={`/profil/${membre.id}/modifier`}
-          className="rounded-full bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-primary-dark)]"
-        >
-          Modifier le profil
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href={`/profil/${membre.id}/famille`}
+            className="rounded-full border border-[var(--color-primary)] px-5 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary)]/10"
+          >
+            Gérer ma famille
+          </Link>
+          <Link
+            href={`/profil/${membre.id}/modifier`}
+            className="rounded-full bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-primary-dark)]"
+          >
+            Modifier le profil
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
