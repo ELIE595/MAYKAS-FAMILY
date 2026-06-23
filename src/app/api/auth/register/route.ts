@@ -6,13 +6,16 @@ import { z } from "zod";
 const inscriptionSchema = z.object({
   email: z.string().email(),
   motDePasse: z.string().min(6),
-  // Si l'utilisateur réclame un profil existant créé par un parent
-  profilExistantId: z.string().optional(),
-  // Sinon, infos pour un nouveau profil
-  nom: z.string().optional(),
+  nom: z.string().min(1),
   postNom: z.string().optional(),
-  prenom: z.string().optional(),
-  sexe: z.enum(["HOMME", "FEMME"]).optional(),
+  prenom: z.string().min(1),
+  sexe: z.enum(["HOMME", "FEMME"]),
+  dateNaissance: z.string().optional(),
+  lieuNaissance: z.string().optional(),
+  ville: z.string().optional(),
+  pays: z.string().optional(),
+  telephonePrincipal: z.string().optional(),
+  situationMatrimoniale: z.enum(["CELIBATAIRE", "MARIE", "DIVORCE", "VEUF", "CONCUBINAGE"]).optional(),
 });
 
 // POST /api/auth/register
@@ -21,70 +24,35 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = inscriptionSchema.parse(body);
 
+    // Vérifier si l'email est déjà utilisé
+    const emailExistant = await prisma.membre.findUnique({ where: { email: data.email } });
+    if (emailExistant) {
+      return NextResponse.json(
+        { success: false, error: "Cet email est déjà utilisé." },
+        { status: 409 }
+      );
+    }
+
     const motDePasseHash = await hashMotDePasse(data.motDePasse);
 
-    let membre;
-
-    if (data.profilExistantId) {
-      // L'utilisateur réclame un profil créé par un parent (enfant devenu majeur)
-      const profilExistant = await prisma.membre.findUnique({
-        where: { id: data.profilExistantId },
-      });
-
-      if (!profilExistant) {
-        return NextResponse.json(
-          { success: false, error: "Profil introuvable." },
-          { status: 404 }
-        );
-      }
-
-      if (profilExistant.email) {
-        return NextResponse.json(
-          { success: false, error: "Ce profil est déjà associé à un compte." },
-          { status: 409 }
-        );
-      }
-
-      membre = await prisma.membre.update({
-        where: { id: data.profilExistantId },
-        data: {
-          email: data.email,
-          motDePasseHash,
-          statutCompte: "ACTIF",
-        },
-      });
-    } else {
-      // Nouveau membre indépendant (un descendant qui crée son compte directement)
-      if (!data.nom || !data.prenom || !data.sexe) {
-        return NextResponse.json(
-          { success: false, error: "Nom, prénom et sexe sont requis." },
-          { status: 400 }
-        );
-      }
-
-      const emailExistant = await prisma.membre.findUnique({
-        where: { email: data.email },
-      });
-      if (emailExistant) {
-        return NextResponse.json(
-          { success: false, error: "Cet email est déjà utilisé." },
-          { status: 409 }
-        );
-      }
-
-      membre = await prisma.membre.create({
-        data: {
-          email: data.email,
-          motDePasseHash,
-          nom: data.nom,
-          postNom: data.postNom,
-          prenom: data.prenom,
-          sexe: data.sexe,
-          statutCompte: "ACTIF",
-          generation: 1,
-        },
-      });
-    }
+    const membre = await prisma.membre.create({
+      data: {
+        email: data.email,
+        motDePasseHash,
+        nom: data.nom,
+        postNom: data.postNom,
+        prenom: data.prenom,
+        sexe: data.sexe,
+        dateNaissance: data.dateNaissance ? new Date(data.dateNaissance) : null,
+        lieuNaissance: data.lieuNaissance,
+        ville: data.ville,
+        pays: data.pays,
+        telephonePrincipal: data.telephonePrincipal,
+        situationMatrimoniale: data.situationMatrimoniale,
+        statutCompte: "ACTIF",
+        generation: 1,
+      },
+    });
 
     const token = genererToken({
       membreId: membre.id,
