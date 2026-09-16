@@ -24,44 +24,45 @@ function versResume(m: Membre): MembreResume {
   };
 }
 
-/**
- * Construit l'arbre généalogique complet à partir de la base de données.
- * Démarre depuis les membres de génération 0 (les ancêtres fondateurs)
- * et descend récursivement via les relations PARENT_ENFANT et CONJOINT.
- */
 export async function construireArbreGenealogique(): Promise<NoeudArbre[]> {
   const membres: MembreAvecRelations[] = await prisma.membre.findMany({
-    include: {
-      relationsA: true,
-      relationsB: true,
-    },
+    include: { relationsA: true, relationsB: true },
   });
 
   const parId = new Map(membres.map((m) => [m.id, m]));
 
+  // Collect all relation data in flat arrays for fast lookup
+  const toutesRelations: RelationFamiliale[] = membres.flatMap((m) => m.relationsA);
+
   function getEnfants(membreId: string): string[] {
-    const enfants = new Set<string>();
-    for (const m of membres) {
-      for (const rel of m.relationsA) {
-        if (rel.type === "PARENT_ENFANT" && rel.membreAId === membreId) {
-          enfants.add(rel.membreBId);
-        }
-      }
-    }
-    return Array.from(enfants);
+    return toutesRelations
+      .filter((r) => r.type === "PARENT_ENFANT" && r.membreAId === membreId)
+      .map((r) => r.membreBId);
   }
 
   function getConjoints(membreId: string): string[] {
     const conjoints = new Set<string>();
-    for (const m of membres) {
-      for (const rel of m.relationsA) {
-        if (rel.type === "CONJOINT" && rel.statutActuel) {
-          if (rel.membreAId === membreId) conjoints.add(rel.membreBId);
-          if (rel.membreBId === membreId) conjoints.add(rel.membreAId);
-        }
+    for (const rel of toutesRelations) {
+      if (rel.type === "CONJOINT" && rel.statutActuel) {
+        if (rel.membreAId === membreId) conjoints.add(rel.membreBId);
+        if (rel.membreBId === membreId) conjoints.add(rel.membreAId);
       }
     }
     return Array.from(conjoints);
+  }
+
+  function aUnParent(membreId: string): boolean {
+    return toutesRelations.some(
+      (r) => r.type === "PARENT_ENFANT" && r.membreBId === membreId
+    );
+  }
+
+  function estConjointDeQuelquun(membreId: string): boolean {
+    return toutesRelations.some(
+      (r) =>
+        r.type === "CONJOINT" &&
+        (r.membreAId === membreId || r.membreBId === membreId)
+    );
   }
 
   const visites = new Set<string>();
@@ -71,7 +72,10 @@ export async function construireArbreGenealogique(): Promise<NoeudArbre[]> {
     if (!membre || visites.has(membreId)) return null;
     visites.add(membreId);
 
+    // Marquer les conjoints comme visités pour qu'ils n'apparaissent pas en tant que racines
     const conjointsIds = getConjoints(membreId);
+    conjointsIds.forEach((cid) => visites.add(cid));
+
     const conjoints = conjointsIds
       .map((id) => parId.get(id))
       .filter((m): m is MembreAvecRelations => m !== undefined)
@@ -89,9 +93,19 @@ export async function construireArbreGenealogique(): Promise<NoeudArbre[]> {
     };
   }
 
-  // Racines = ancêtres fondateurs (génération 0)
-  const racines = membres
-    .filter((m) => m.generation === 0)
+  // Racines = membres sans parent ET qui ne sont pas uniquement conjoint d'un autre
+  // Priorité : génération 0 d'abord, puis HOMME avant FEMME pour éviter doublons conjoints
+  const candidatsRacines = membres
+    .filter((m) => !aUnParent(m.id))
+    .sort((a, b) => {
+      if (a.generation !== b.generation) return a.generation - b.generation;
+      // Homme en premier dans un couple pour éviter doublon
+      if (a.sexe === "HOMME" && b.sexe === "FEMME") return -1;
+      if (a.sexe === "FEMME" && b.sexe === "HOMME") return 1;
+      return 0;
+    });
+
+  const racines = candidatsRacines
     .map((m) => construireNoeud(m.id))
     .filter((n): n is NoeudArbre => n !== null);
 
